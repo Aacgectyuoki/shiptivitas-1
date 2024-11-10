@@ -10,9 +10,9 @@ export default class Board extends React.Component {
     const clients = this.getClients().map(client => ({ ...client, status: 'backlog' }));
     this.state = {
       clients: {
-        backlog: clients,  // All tasks initially in backlog
-        inProgress: [],
-        complete: []
+        backlog: clients.filter(client => client.status === 'backlog'),
+        inProgress: clients.filter(client => client.status === 'in-progress'),
+        complete: clients.filter(client => client.status === 'complete')
       }
     };
     this.swimlanes = {
