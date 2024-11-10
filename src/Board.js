@@ -43,6 +43,11 @@ export default class Board extends React.Component {
   }
 
   updateClientStatus(clientId, newStatus) {
+    if (!newStatus) {
+      console.error(`Invalid swimlane status: ${newStatus}`);
+      return;
+    }
+  
     this.setState(prevState => {
       const clients = { ...prevState.clients };
       let client;
