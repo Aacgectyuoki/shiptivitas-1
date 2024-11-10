@@ -7,7 +7,7 @@ import './Board.css';
 export default class Board extends React.Component {
   constructor(props) {
     super(props);
-    const clients = this.getClients().map(client => ({ ...client, status: 'backlog' }));
+    const clients = this.getClients();
     this.state = {
       clients: {
         backlog: clients.filter(client => client.status === 'backlog'),
@@ -31,42 +31,56 @@ export default class Board extends React.Component {
   
     const drake = Dragula(containers, {
       moves: (el, source, handle, sibling) => {
-        return el.classList.contains('Card');
+        if (!el.classList.contains('Card')) {
+          return false;
+        }
+        return true;
       }
     });
   
     drake.on('drop', (el, target, source, sibling) => {
       const clientId = el.getAttribute('data-id');
-      const newStatus = target.getAttribute('data-status');
-      this.updateClientStatus(clientId, newStatus);
+      const newStatus = target ? target.getAttribute('data-status') : null;
+  
+      // Log the target, newStatus, and clientId for debugging
+      console.log("Target Swimlane:", target);
+      console.log("Target Attributes:", target ? target.attributes : null);
+      console.log("New Status:", newStatus);
+      console.log("Client ID:", clientId);
+  
+      // Check if newStatus is valid before proceeding
+      if (newStatus) {
+        this.updateClientStatus(clientId, newStatus);
+        console.log(`Client ${clientId} moved to ${newStatus}`);
+      } else {
+        console.error(`Invalid swimlane status for client ${clientId}`);
+      }
     });
   }
 
   updateClientStatus(clientId, newStatus) {
-    if (!newStatus) {
-      console.error(`Invalid swimlane status: ${newStatus}`);
-      return;
-    }
-  
     this.setState(prevState => {
       const clients = { ...prevState.clients };
       let client;
   
-      // Remove client from previous status
+      // Convert clientId to a number if necessary
+      const parsedClientId = Number(clientId);
+  
+      // Remove client from previous swimlane
       for (const status in clients) {
-        const index = clients[status].findIndex(c => c.id === clientId);
+        const index = clients[status].findIndex(c => c.id === parsedClientId);
         if (index !== -1) {
           client = clients[status].splice(index, 1)[0];
           break;
         }
       }
   
-      // Verify if the target swimlane exists and then update the client status
+      // Update client status and add to the new swimlane
       if (client && clients[newStatus]) {
-        client.status = newStatus;
-        clients[newStatus].push(client);
+        client.status = newStatus;  // Update the status of the client
+        clients[newStatus].push(client);  // Add to the new swimlane
       } else {
-        console.error(`Swimlane "${newStatus}" does not exist or client is undefined`);
+        console.error(`Error: Unable to update client ${clientId} to new status "${newStatus}"`);
       }
   
       return { clients };
@@ -75,7 +89,7 @@ export default class Board extends React.Component {
 
   getClients() {
     return [
-      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
+      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'backlog'],
       ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'complete'],
       ['3','Nolan LLC','Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
       ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'in-progress'],
@@ -102,9 +116,10 @@ export default class Board extends React.Component {
       status: companyDetails[3],
     }));
   }
+
   renderSwimlane(name, clients, ref, status) {
     return (
-      <Swimlane name={name} clients={clients} dragulaRef={ref} data-status={status} />
+      <Swimlane name={name} clients={clients} dragulaRef={ref} status={status} />
     );
   }
 
@@ -113,13 +128,13 @@ export default class Board extends React.Component {
       <div className="Board">
         <div className="container-fluid">
           <div className="row">
-            <div className="col-md-4">
+            <div className="col-md-4" data-status="backlog">
               {this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog, 'backlog')}
             </div>
-            <div className="col-md-4">
+            <div className="col-md-4" data-status="in-progress">
               {this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress, 'in-progress')}
             </div>
-            <div className="col-md-4">
+            <div className="col-md-4" data-status="complete">
               {this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete, 'complete')}
             </div>
           </div>

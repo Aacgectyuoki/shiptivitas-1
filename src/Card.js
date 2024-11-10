@@ -11,6 +11,7 @@ export default class Card extends React.Component {
     } else if (this.props.status === 'complete') {
       className.push('Card-green');
     }
+    
     return (
       <div className={className.join(' ')} data-id={this.props.id} data-status={this.props.status}>
         <div className="Card-title">{this.props.name}</div>
