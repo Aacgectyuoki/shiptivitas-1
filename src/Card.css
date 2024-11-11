@@ -1,21 +1,31 @@
 .Card {
+  background-color: lightgrey;
+  font-size: 12px;
   padding: 20px;
   margin-bottom: 10px;
-  font-size: 12px;
-  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .Card-grey {
-  background-color: lightgrey;
-  color: black; /* Text color for Backlog */
+  background-color: rgba(167, 158, 158, 0.671);
+  color: black;
 }
 
 .Card-blue {
   background-color: skyblue;
-  color: navy; /* Text color for In Progress */
+  color: white;
 }
 
 .Card-green {
-  background-color: green;
-  color: white; /* Text color for Complete */
+  background-color: rgb(150, 190, 150);
+  color: white;
 }
+
+.Card-title {
+  font-weight: bold;
+}
+
+/* .Card-description {
+  margin-top: 10px;
+} */

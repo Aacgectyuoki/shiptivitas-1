@@ -74,11 +74,24 @@ export default class Board extends React.Component {
           break;
         }
       }
-  
+      
+      // Log the clients object and clientId for debugging
+      console.log("Clients object:", clients);
+      console.log("Client ID:", clientId);
+
       // Update client status and add to the new swimlane
       if (client && clients[newStatus]) {
         client.status = newStatus;  // Update the status of the client
         clients[newStatus].push(client);  // Add to the new swimlane
+        let color;
+        if (newStatus === 'backlog') {
+          color = 'grey';
+        } else if (newStatus === 'in-progress') {
+          color = 'blue';
+        } else if (newStatus === 'complete') {
+          color = 'green';
+        }
+        console.log(`Client ${clientId} is now in swimlane "${newStatus}" with color ${color}`);  // Log the new status and color
       } else {
         console.error(`Error: Unable to update client ${clientId} to new status "${newStatus}"`);
       }
